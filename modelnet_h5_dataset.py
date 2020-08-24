@@ -15,15 +15,16 @@ import provider
 
 
 # Download dataset for point cloud classification
-DATA_DIR = os.path.join(ROOT_DIR, 'data')
-if not os.path.exists(DATA_DIR):
-    os.mkdir(DATA_DIR)
-if not os.path.exists(os.path.join(DATA_DIR, 'modelnet40_ply_hdf5_2048')):
-    www = 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
-    zipfile = os.path.basename(www)
-    os.system('wget %s; unzip %s' % (www, zipfile))
-    os.system('mv %s %s' % (zipfile[:-4], DATA_DIR))
-    os.system('rm %s' % (zipfile))
+# Download it manually
+#DATA_DIR = os.path.join(ROOT_DIR, 'data')
+#if not os.path.exists(DATA_DIR):
+#    os.mkdir(DATA_DIR)
+#if not os.path.exists(os.path.join(DATA_DIR, 'modelnet40_ply_hdf5_2048')):
+#    www = 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
+#    zipfile = os.path.basename(www)
+#    os.system('wget %s; unzip %s' % (www, zipfile))
+#    os.system('mv %s %s' % (zipfile[:-4], DATA_DIR))
+#    os.system('rm %s' % (zipfile))
 
 
 def shuffle_data(data, labels):
@@ -38,8 +39,8 @@ def shuffle_data(data, labels):
     np.random.shuffle(idx)
     return data[idx, ...], labels[idx], idx
 
-def getDataFiles(list_filename):
-    return [line.rstrip() for line in open(list_filename)]
+def getDataFiles(data_dir, list_filename):
+    return [os.path.join(data_dir,line.rstrip()) for line in open(os.path.join(data_dir,list_filename))]
 
 def load_h5(h5_filename):
     f = h5py.File(h5_filename)
@@ -52,12 +53,12 @@ def loadDataFile(filename):
 
 
 class ModelNetH5Dataset(object):
-    def __init__(self, list_filename, batch_size = 32, npoints = 1024, shuffle=True):
+    def __init__(self, data_dir, list_filename, batch_size = 32, npoints = 1024, shuffle=True):
         self.list_filename = list_filename
         self.batch_size = batch_size
         self.npoints = npoints
         self.shuffle = shuffle
-        self.h5_files = getDataFiles(self.list_filename)
+        self.h5_files = getDataFiles(data_dir, self.list_filename)
         self.reset()
 
     def reset(self):
